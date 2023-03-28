@@ -1,11 +1,27 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { useDispatch } from "react-redux";
-import { addProduct } from "../../features/product/productSlice";
+import { toast } from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
+import { addProduct, togglePostSuccess } from "../../features/product/productSlice";
 
 const AddProduct = () => {
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit, reset } = useForm();
   const dispatch = useDispatch()
+  const {isLoading, postSuccess, error, isError}=useSelector(state=>state.products)
+  
+  useEffect(() => {
+    if (isLoading) {
+      toast.loading("Adding....", {id:"addProduct"})
+    }
+    if (!isLoading && postSuccess) {
+      toast.success("Product Added", { id: "addProduct" })
+      dispatch(togglePostSuccess())
+      reset()
+    }
+    if (isError && !isLoading) {
+      toast.error(error, {id:"addProduct"})
+    }
+  },[isLoading, isError, error, postSuccess, reset])
   const submit = (data) => {
     const product = {
       model: data.model,
@@ -68,6 +84,7 @@ const AddProduct = () => {
                 id='available'
                 value={true}
                 {...register("status")}
+                required
               />
               <label className='ml-2 text-lg' htmlFor='available'>
                 Available
