@@ -21,7 +21,7 @@ const AddProduct = () => {
     if (isError && !isLoading) {
       toast.error(error, {id:"addProduct"})
     }
-  },[isLoading, isError, error, postSuccess, reset])
+  },[isLoading, isError, error, postSuccess])
   const submit = (data) => {
     const product = {
       model: data.model,

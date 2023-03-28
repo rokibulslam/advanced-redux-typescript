@@ -1,9 +1,10 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { fetchProducts, postProduct } from "./productAPI";
+import { deleteProduct, fetchProducts, postProduct } from "./productAPI";
 
 const myInitialState = {
   products: [],
   isLoading: false,
+  deleteSuccess:false,
   postSuccess: false,
   isError: false,
   error: "",
@@ -23,13 +24,23 @@ export const addProduct = createAsyncThunk(
     return products;
   }
 );
+export const removeProduct = createAsyncThunk(
+  "products/removeProduct",
+  async (id) => {
+    const products = deleteProduct(id)
+    return products;
+  }
+);
 const productsSlice = createSlice({
   name: "products",
-    initialState: myInitialState,
-    reducers: {
-        togglePostSuccess: (state) => {
-            state.postSuccess=false
-        }  
+  initialState: myInitialState,
+  reducers: {
+    togglePostSuccess: (state) => {
+      state.postSuccess = false;
+    },
+    toggleDeleteSuccess: (state) => {
+      state.deleteSuccess = false;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -65,9 +76,26 @@ const productsSlice = createSlice({
         state.isLoading = false;
         state.isError = true;
         state.error = action.error.message;
+      })
+      // Delete Product
+      .addCase(removeProduct.pending, (state, action) => {
+        state.isLoading = true;
+        state.deleteSuccess = false;
+        state.isError = false;
+      })
+      .addCase(removeProduct.fulfilled, (state, action) => {
+        state.deleteSuccess = true;
+        state.isLoading = false;
+      })
+      .addCase(removeProduct.rejected, (state, action) => {
+        state.products = [];
+        state.deleteSuccess = false;
+        state.isLoading = false;
+        state.isError = true;
+        state.error = action.error.message;
       });
   },
 });
 
-export const {togglePostSuccess}=productsSlice.actions
+export const {togglePostSuccess, toggleDeleteSuccess}=productsSlice.actions
 export default productsSlice.reducer;
