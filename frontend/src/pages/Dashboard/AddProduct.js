@@ -1,9 +1,11 @@
 import React from "react";
 import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
+import { addProduct } from "../../features/product/productSlice";
 
 const AddProduct = () => {
   const { register, handleSubmit } = useForm();
-
+  const dispatch = useDispatch()
   const submit = (data) => {
     const product = {
       model: data.model,
@@ -18,8 +20,8 @@ const AddProduct = () => {
       ],
       spec: [],
     };
-
-    console.log(product);
+    dispatch(addProduct(product));
+    
   };
 
   return (
